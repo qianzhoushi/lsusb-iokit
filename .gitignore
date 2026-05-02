@@ -2,6 +2,8 @@
 /.build
 /.swift-cache
 /Packages
+/homebrew-tap
+/lsusb-iokit-v*.tar.gz
 xcuserdata/
 DerivedData/
 .swiftpm/configuration/registries.json

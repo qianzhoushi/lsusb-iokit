@@ -1,53 +1,117 @@
 # lsusb-iokit
 
-一个在 macOS 上提供 `lsusb` 风格输出的原生命令行工具。
+`lsusb-iokit` is a macOS-native `lsusb` implementation built with `Swift + IOKit`.
 
-项目现在是标准 Swift Package，底层使用 `Swift + IOKit`，不依赖 `ioreg`、Homebrew 或第三方驱动。
+It is designed for the case where existing Homebrew `lsusb` options do not work well on macOS, or when you want a native implementation that reads directly from the macOS USB registry instead of relying on `ioreg` output parsing.
 
-安装后的命令名是：
+The installed command name is:
 
 ```bash
 lsusb
 ```
 
-## 项目结构
+## Features
 
-- `Package.swift`：Swift Package 定义
-- `Sources/lsusb/main.swift`：主程序源码
-- `lsusb_macos`：保留的 Swift 脚本版本，便于直接运行源码
+- Native macOS implementation using `IOKit`
+- `lsusb`-style output for quick terminal inspection
+- Verbose mode with extra device details
+- JSON output for scripting and automation
+- Distributed as a standard Swift Package
 
-## 构建
+## Install
 
-如果本机 Swift 默认缓存目录不可写，可以把模块缓存放到项目目录：
+### Homebrew tap
 
 ```bash
+brew tap qianzhoushi/tap
+brew install lsusb-iokit
+```
+
+### Build from source
+
+```bash
+git clone https://github.com/qianzhoushi/lsusb-iokit.git
+cd lsusb-iokit
 mkdir -p .swift-cache .build
 CLANG_MODULE_CACHE_PATH=$PWD/.swift-cache swift build --disable-sandbox --build-path $PWD/.build -c release
 ```
 
-构建完成后的二进制在：
+The compiled binary will be:
 
 ```bash
 .build/release/lsusb
 ```
 
-## 运行
+## Usage
 
 ```bash
-.build/release/lsusb
-.build/release/lsusb -v
-.build/release/lsusb --json
+lsusb
+lsusb -v
+lsusb --json
 ```
 
-## 示例输出
+If you are running directly from the build output:
+
+```bash
+./.build/release/lsusb
+./.build/release/lsusb -v
+./.build/release/lsusb --json
+```
+
+## Example output
+
+Default output:
 
 ```text
 Bus 001 Device 001: ID 05ac:12a8 Apple Inc. iPhone
 ```
 
-## 实现说明
+Verbose output:
 
-- 数据源使用 `IOKit` 直接遍历 `IOUSB` 注册表并筛选 `IOUSBHostDevice`
-- 输出风格参考 Linux 上的 `lsusb`
-- `Bus` 编号来自 USB Host Controller 的顺序映射
-- `Device` 编号优先使用系统报告的 USB 地址
+```text
+Bus 001 Device 001: ID 05ac:12a8 Apple Inc. iPhone
+  Vendor:       Apple Inc. (05ac)
+  Product:      iPhone (12a8)
+  Serial:       00008150000574563C8A401C
+  Location ID:  0x00100000
+```
+
+JSON output:
+
+```json
+[
+  {
+    "bus": 1,
+    "device": 1,
+    "vendorID": 1452,
+    "productID": 4776,
+    "vendorName": "Apple Inc.",
+    "productName": "iPhone"
+  }
+]
+```
+
+## How It Works
+
+- Enumerates the `IOUSB` registry plane directly through `IOKit`
+- Filters `IOUSBHostDevice` entries
+- Maps each device to a synthetic `Bus` number based on its USB host controller
+- Uses the system-reported USB address as the `Device` number when available
+
+This keeps the tool close to the familiar Linux `lsusb` experience while remaining native to macOS.
+
+## Project layout
+
+- `Package.swift`: Swift Package definition
+- `Sources/lsusb/main.swift`: command-line entry point
+- `lsusb_macos`: standalone Swift script version kept for convenience
+
+## Notes
+
+- This project is macOS-only
+- It depends on Apple `IOKit`, not `libusb`
+- If Swift's default module cache is not writable in your environment, keeping `CLANG_MODULE_CACHE_PATH` inside the project directory is the safest option
+
+## License
+
+[MIT](./LICENSE)

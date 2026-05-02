@@ -50,7 +50,7 @@ enum CLIError: Error, CustomStringConvertible {
 func usage() {
     print(
         """
-        Usage: lsusb_macos [-v|--verbose] [--json]
+        Usage: lsusb [-v|--verbose] [--json]
 
           -v, --verbose   show extra device details
               --json      output as JSON
