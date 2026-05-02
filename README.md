@@ -72,7 +72,7 @@ Verbose output:
 Bus 001 Device 001: ID 05ac:12a8 Apple Inc. iPhone
   Vendor:       Apple Inc. (05ac)
   Product:      iPhone (12a8)
-  Serial:       00008150000574563C8A401C
+  Serial:       1A2B3C4D5E6F7G8H9J0K1L2M
   Location ID:  0x00100000
 ```
 
